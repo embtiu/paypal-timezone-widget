@@ -1,258 +1,1031 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Horizontal Notion Widgets — Design Preview</title>
-  <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; font: 14px/1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #272725; background: #f4f3f0; }
-    button, input, select { font: inherit; }
-    button { cursor: pointer; }
-    .preview { padding: 34px 18px 60px; min-height: 100vh; }
-    .preview-bar { max-width: 815px; margin: 0 auto 20px; display: flex; align-items: end; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
-    .preview-bar h1 { font-size: 21px; letter-spacing: -.6px; margin: 0 0 4px; }
-    .preview-bar p { color: #83827e; margin: 0; font-size: 12px; }
-    .tabs { display: flex; gap: 4px; padding: 4px; background: #eae8e4; border-radius: 11px; }
-    .tabs button { border: 0; background: transparent; color: #6f6e6a; border-radius: 8px; padding: 8px 14px; font-size: 12px; font-weight: 650; }
-    .tabs button.active { background: #fff; color: #2c2c2a; box-shadow: 0 1px 3px #302c251c; }
-    .stage { max-width: 815px; margin: 0 auto; }
-    .widget { --text:#282826; --muted:#85847f; --line:#e8e6e2; --soft:#faf9f7; --surface:#fff; --green:#4f806f; --green-soft:#eaf4ee; background:var(--surface); color:var(--text); width: 815px; height: 360px; padding: 17px 20px 14px; border: 1px solid #e5e3df; border-radius: 18px; box-shadow: 0 8px 24px #37332a08; overflow:hidden; }
-    .widget[hidden] { display:none; }
-    .whead { display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; border-bottom:1px solid var(--line); height: 58px; }
-    .eyebrow { text-transform:uppercase; letter-spacing:1.5px; font-size:10px; font-weight:750; color:#8a8985; margin-bottom:3px; }
-    .whead h2 { font-size:21px; letter-spacing:-.7px; line-height:1.05; margin:0; font-weight:730; }
-    .head-actions { display:flex; align-items:center; gap:8px; }
-    .mini-pill { color:#77756f; font-size:11px; font-weight:650; border:1px solid var(--line); padding:6px 10px; border-radius:20px; white-space:nowrap; background:var(--soft); }
-    .widget-body { display:grid; gap:11px; padding-top:12px; height:243px; }
-    .paypal-body { grid-template-columns: 1fr 1fr 1fr; }
-    .section { border:1px solid var(--line); background:var(--soft); border-radius:13px; padding:12px 13px; min-width:0; position:relative; }
-    .section h3 { font-size:12px; margin:0 0 12px; font-weight:740; letter-spacing:.05px; }
-    .section-top { display:flex; justify-content:space-between; align-items:center; gap:6px; }
-    .field-label { display:block; font-size:10px; color:var(--muted); font-weight:750; letter-spacing:.55px; text-transform:uppercase; margin-bottom:5px; }
-    .money-input { display:flex; align-items:center; width:100%; border:1px solid #e2dfdb; background:var(--surface); border-radius:9px; height:44px; padding:0 10px; gap:7px; }
-    .money-input:focus-within { outline:2px solid #b8d4c7; outline-offset:1px; }
-    .money-input .currency { color:#999690; font-weight:700; font-size:15px; }
-    .money-input input { border:0; background:transparent; outline:none; min-width:0; width:100%; color:var(--text); font-size:20px; font-weight:660; letter-spacing:-.5px; }
-    .big-result { padding-top:13px; }
-    .big-result .field-label { margin-bottom:1px; }
-    .big-number { color:var(--green); font-size:28px; font-weight:740; letter-spacing:-1px; line-height:1.2; font-variant-numeric:tabular-nums; }
-    .statline { margin-top:9px; padding-top:8px; border-top:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; gap:8px; color:var(--muted); font-size:11px; }
-    .statline strong { color:var(--text); font-variant-numeric:tabular-nums; font-size:12px; }
-    .rate-field { display:flex; gap:7px; align-items:center; }
-    .rate-field .money-input { flex:1; height:41px; }
-    .rate-field .money-input input { font-size:17px; }
-    .rate-hint { font-size:10px; color:var(--muted); line-height:1.4; margin-top:5px; }
-    .widget-footer { display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:10px; line-height:1.35; color:var(--muted); margin-top:10px; }
-    .footer-note { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .tiny-dot { display:inline-block; height:6px; width:6px; border-radius:50%; background:#76a78d; margin-right:5px; vertical-align:1px; }
-    .badge-soft { background:var(--green-soft); color:var(--green); padding:5px 8px; border-radius:14px; font-size:10px; font-weight:750; }
-    .time-body { grid-template-columns: 286px 1fr; }
-    .timezone-start h3 { margin:0; }
-    .small-btn { background:#fff; border:1px solid #e8e5df; border-radius:8px; color:#6f6d68; font-weight:650; padding:5px 8px; font-size:10px; }
-    .small-btn:hover { background:#f3f1ee; }
-    .date-grid { display:grid; grid-template-columns:1.15fr 1fr; gap:8px; margin:15px 0 10px; }
-    .date-grid input { height:40px; width:100%; border-radius:8px; border:1px solid #e2dfdb; background:#fff; color:var(--text); padding:0 8px; min-width:0; font-size:12px; }
-    .zone-select { height:42px; width:100%; border:1px solid #e2dfdb; border-radius:8px; background:#fff; color:var(--text); padding:0 10px; font-size:12px; }
-    .results { background:#fff; padding:11px 13px 8px; }
-    .results-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:7px; }
-    .results-header h3 { margin:0; }
-    .zone-row { display:grid; grid-template-columns:1fr auto 17px; gap:10px; align-items:center; padding:9px 0; border-top:1px solid var(--line); min-height:55px; }
-    .city { font-size:12px; font-weight:720; line-height:1.2; }
-    .zone-date { color:var(--muted); font-size:10px; margin-top:3px; }
-    .zone-time { font-size:19px; font-weight:730; letter-spacing:-.6px; text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
-    .remove-zone { border:0; background:transparent; color:#bbb7b1; font-size:17px; width:17px; padding:0; line-height:1; }
-    .remove-zone:hover { color:#aa5750; }
-    .zone-list { max-height:183px; overflow:auto; scrollbar-width:thin; }
-    .segmented { display:flex; border:1px solid var(--line); border-radius:21px; padding:3px; background:var(--soft); }
-    .segmented button { border:0; border-radius:18px; padding:5px 9px; background:transparent; font-size:11px; color:#8a8985; font-weight:750; }
-    .segmented button.selected { background:#fff; color:#252525; box-shadow:0 1px 3px #332f2417; }
-    .zone-menu { position:absolute; right:12px; top:42px; z-index:4; width:190px; padding:6px; border:1px solid var(--line); border-radius:10px; background:#fff; box-shadow:0 7px 20px #22222220; display:none; }
-    .zone-menu.open { display:block; }
-    .zone-menu button { display:block; width:100%; border:0; padding:8px; border-radius:6px; background:transparent; color:#343330; font-size:11px; text-align:left; }
-    .zone-menu button:hover { background:#f5f3ef; }
-    .hint { max-width:815px; margin:12px auto 0; color:#85827d; font-size:11px; text-align:center; }
-    @media (max-width:850px) { .stage { overflow-x:auto; padding-bottom:6px; } .widget { flex-shrink:0; } }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+  :root {
+    --white: #FFFFFF;
+    --panel: #FAF9F7;
+    --text: #272726;
+    --muted: #8B8A86;
+    --border: #E5E3DF;
+    --green: #508573;
+    --green-pale: #E8F3EE;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  }
+
+  .stage {
+    padding: 7px;
+    max-width: 829px;
+    margin: auto;
+    background: transparent;
+  }
+
+  .widget {
+    width: 100%;
+    height: 360px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow:
+      0 2px 4px rgba(40, 35, 28, .025),
+      0 12px 30px rgba(40, 35, 28, .07);
+    overflow: hidden;
+  }
+
+  /* Tabs */
+
+  .switcher {
+    display: flex;
+    padding: 9px 18px 0;
+    gap: 22px;
+    height: 37px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .switcher button {
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 650;
+    padding: 0 2px 8px;
+    cursor: pointer;
+  }
+
+  .switcher button.active {
+    color: var(--text);
+    border-bottom-color: var(--text);
+  }
+
+  .view {
+    display: none;
+    padding: 13px 20px 10px;
+  }
+
+  .view.active {
+    display: block;
+  }
+
+  /* Header */
+
+  .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 52px;
+    margin-bottom: 9px;
+  }
+
+  .eyebrow {
+    font-size: 10px;
+    letter-spacing: 2px;
+    font-weight: 800;
+    color: var(--muted);
+    margin-bottom: 3px;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 23px;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -1.1px;
+  }
+
+  .head-right {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  /* Live indicator */
+
+  .live {
+    border: 0;
+    background: var(--green-pale);
+    color: var(--green);
+    border-radius: 100px;
+    font-weight: 750;
+    font-size: 10px;
+    letter-spacing: .3px;
+    padding: 8px 11px;
+    cursor: pointer;
+  }
+
+  .live.off {
+    background: #F2F1EF;
+    color: #77746E;
+  }
+
+  .live .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #74AC91;
+    display: inline-block;
+    margin-right: 6px;
+  }
+
+  /* 12h / 24h toggle */
+
+  .toggle {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    border-radius: 25px;
+  }
+
+  .toggle button {
+    background: transparent;
+    border: 0;
+    border-radius: 20px;
+    color: var(--muted);
+    cursor: pointer;
+    font-weight: 750;
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .toggle button.active {
+    background: var(--white);
+    color: var(--text);
+    box-shadow: 0 2px 5px rgba(40, 35, 28, .1);
+  }
+
+  .rule {
+    height: 1px;
+    background: var(--border);
+    margin-bottom: 12px;
+  }
+
+  /* Timezone converter */
+
+  .clock-grid {
+    display: grid;
+    grid-template-columns: 40% minmax(0, 1fr);
+    gap: 11px;
+    height: 213px;
+  }
+
+  .panel {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 13px 14px;
+    min-width: 0;
+  }
+
+  .start-panel {
+    background: var(--panel);
+  }
+
+  .results-panel {
+    background: var(--white);
+  }
+
+  .panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .panel-title {
+    font-weight: 750;
+    font-size: 14px;
+  }
+
+  .small-button {
+    background: var(--white);
+    color: #706F6B;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 7px 10px;
+    font-size: 11px;
+    font-weight: 650;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .small-button:hover {
+    border-color: #C8C5BE;
+  }
+
+  .two-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+    margin-bottom: 11px;
+  }
+
+  label {
+    display: block;
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--muted);
+    letter-spacing: .7px;
+    margin-bottom: 6px;
+  }
+
+  input, select {
+    width: 100%;
+    min-width: 0;
+    height: 39px;
+    border: 1px solid #DEDCD8;
+    border-radius: 9px;
+    background: var(--white);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+    padding: 0 10px;
+    outline: none;
+  }
+
+  input:focus, select:focus {
+    border-color: #93AD9F;
+    box-shadow: 0 0 0 2px #E8F3EE;
+  }
+
+  .hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 10px;
+  }
+
+  .results-head {
+    margin-bottom: 9px;
+  }
+
+  .city-list {
+    border-top: 1px solid var(--border);
+  }
+
+  .city-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 49px;
+    border-bottom: 1px solid var(--border);
+    gap: 8px;
+  }
+
+  .city-row:last-child {
+    border-bottom: 0;
+  }
+
+  .city-name {
+    font-size: 13px;
+    font-weight: 750;
+  }
+
+  .city-date {
+    color: var(--muted);
+    font-size: 10px;
+    margin-top: 3px;
+  }
+
+  .city-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .city-time {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -.6px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .remove {
+    color: #BAB7B1;
+    background: transparent;
+    border: 0;
+    font-size: 19px;
+    cursor: pointer;
+    padding: 2px;
+  }
+
+  /* Add city dropdown */
+
+  .add-wrap {
+    position: relative;
+  }
+
+  .add-picker {
+    display: none;
+    position: absolute;
+    z-index: 4;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px;
+    box-shadow: 0 8px 24px rgba(40, 35, 28, .12);
+    right: 0;
+    top: 31px;
+    width: 185px;
+  }
+
+  .add-picker button {
+    display: block;
+    border: none;
+    background: transparent;
+    padding: 7px 8px;
+    text-align: left;
+    width: 100%;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 12px;
+  }
+
+  .add-picker button:hover {
+    background: var(--panel);
+  }
+
+  /* Footer */
+
+  .foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 10px;
+  }
+
+  /* PayPal calculator */
+
+  .pay-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    height: 213px;
+  }
+
+  .pay-panel {
+    background: var(--panel);
+  }
+
+  .pay-title {
+    font-size: 12px;
+    font-weight: 750;
+    min-height: 29px;
+  }
+
+  .pay-panel input {
+    height: 38px;
+    font-size: 17px;
+    font-weight: 650;
+  }
+
+  .metric-label {
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--muted);
+    letter-spacing: .55px;
+    margin-top: 12px;
+  }
+
+  .metric {
+    font-size: 25px;
+    letter-spacing: -.8px;
+    font-weight: 800;
+    color: var(--green);
+    margin-top: 3px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .detail {
+    border-top: 1px solid var(--border);
+    margin-top: 9px;
+    padding-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .detail strong {
+    color: var(--text);
+    font-size: 11px;
+  }
+
+  /* Responsive layout */
+
+  @media (max-width: 620px) {
+    .widget {
+      height: auto;
+      min-height: 360px;
+    }
+
+    .clock-grid,
+    .pay-grid {
+      grid-template-columns: 1fr;
+      height: auto;
+    }
+
+    .head {
+      gap: 8px;
+    }
+
+    .head-right {
+      gap: 4px;
+    }
+
+    h1 {
+      font-size: 19px;
+    }
+
+    .view {
+      padding: 12px;
+    }
+
+    .foot {
+      flex-wrap: wrap;
+    }
+  }
+</style>
 </head>
+
 <body>
-  <main class="preview">
-    <div class="preview-bar">
-      <div><h1>Horizontal widget concepts</h1><p>Two separate Notion embeds · each designed at 815 × 360 px</p></div>
-      <div class="tabs" role="tablist" aria-label="Preview widget">
-        <button id="tab-paypal" class="active" role="tab" aria-selected="true" aria-controls="paypal-widget">PayPal calculator</button>
-        <button id="tab-time" role="tab" aria-selected="false" aria-controls="timezone-widget">Timezone converter</button>
+
+<div class="stage">
+  <div class="widget">
+
+    <!-- Tabs -->
+
+    <nav class="switcher" aria-label="Widget tabs">
+      <button id="tab-pay" onclick="switchTab('pay')">
+        PayPal Calculator
+      </button>
+
+      <button id="tab-clock" class="active" onclick="switchTab('clock')">
+        Time Zone Converter
+      </button>
+    </nav>
+
+    <!-- TIME ZONE CONVERTER -->
+
+    <section id="clock-view" class="view active">
+
+      <div class="head">
+        <div>
+          <div class="eyebrow">WORLD CLOCK</div>
+          <h1>Time Zone Converter</h1>
+        </div>
+
+        <div class="head-right">
+          <button class="live" id="live" onclick="toggleLive()">
+            <span class="dot"></span>LIVE
+          </button>
+
+          <div class="toggle">
+            <button id="hour12" class="active" onclick="setHours(false)">
+              12h
+            </button>
+
+            <button id="hour24" onclick="setHours(true)">
+              24h
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="stage">
-      <section class="widget" id="paypal-widget" aria-label="PayPal calculator design">
-        <div class="whead">
-          <div><div class="eyebrow">Money tools</div><h2>PayPal Calculator</h2></div>
-          <div class="head-actions"><span class="mini-pill">USD → PHP</span><span class="badge-soft">Fee preview</span></div>
-        </div>
-        <div class="widget-body paypal-body">
-          <div class="section">
-            <h3>01 · Amount I want to receive</h3>
-            <label class="field-label" for="target">Target net (USD)</label>
-            <div class="money-input"><span class="currency">$</span><input id="target" type="number" min="0" step="0.01" value="45" inputmode="decimal"></div>
-            <div class="big-result"><div class="field-label">Charge your client</div><div class="big-number" id="gross-value">$47.39</div></div>
-            <div class="statline"><span>Estimated PayPal fee</span><strong id="target-fee">$2.39</strong></div>
-          </div>
-          <div class="section">
-            <h3>02 · Actual amount charged</h3>
-            <label class="field-label" for="actual">What I'll charge (USD)</label>
-            <div class="money-input"><span class="currency">$</span><input id="actual" type="number" min="0" step="0.01" value="48" inputmode="decimal"></div>
-            <div class="big-result"><div class="field-label">I'll receive after fees</div><div class="big-number" id="actual-net">$45.59</div></div>
-            <div class="statline"><span>Estimated PayPal fee</span><strong id="actual-fee">$2.41</strong></div>
-          </div>
-          <div class="section">
-            <div class="section-top"><h3>03 · USD to PHP estimate</h3><span class="badge-soft">−3.31%</span></div>
-            <label class="field-label" for="market-rate">Example market rate (PHP / USD)</label>
-            <div class="rate-field"><div class="money-input"><span class="currency">₱</span><input id="market-rate" type="number" min="0" step="0.0001" value="58.50" inputmode="decimal"></div></div>
-            <div class="big-result"><div class="field-label">Estimated pesos received</div><div class="big-number" id="php-value">₱2,578.91</div></div>
-            <div class="statline"><span>Adjusted PayPal rate</span><strong id="adjusted-rate">₱56.56</strong></div>
-          </div>
-        </div>
-        <div class="widget-footer"><span class="footer-note">PayPal fee estimate: 4.4% + $0.30 per transaction.</span><span class="footer-note">Exchange rate is editable demo data, not live.</span></div>
-      </section>
 
-      <section class="widget" id="timezone-widget" aria-label="Timezone converter design" hidden>
-        <div class="whead">
-          <div><div class="eyebrow">World clock</div><h2>Time Zone Converter</h2></div>
-          <div class="head-actions"><span class="badge-soft" id="live-pill"><span class="tiny-dot"></span>LIVE</span><div class="segmented" aria-label="Time format"><button data-format="12" class="selected" aria-pressed="true">12h</button><button data-format="24" aria-pressed="false">24h</button></div></div>
-        </div>
-        <div class="widget-body time-body">
-          <div class="section timezone-start">
-            <div class="section-top"><h3>Starting time</h3><button class="small-btn" id="use-now">Use now</button></div>
-            <div class="date-grid">
-              <div><label class="field-label" for="source-date">Date</label><input type="date" id="source-date"></div>
-              <div><label class="field-label" for="source-time">Time</label><input type="time" id="source-time" step="60"></div>
+      <div class="rule"></div>
+
+      <div class="clock-grid">
+
+        <!-- Starting Time -->
+
+        <div class="panel start-panel">
+
+          <div class="panel-head">
+            <span class="panel-title">Starting time</span>
+
+            <button class="small-button" onclick="useNow()">
+              Use now
+            </button>
+          </div>
+
+          <div class="two-inputs">
+            <div>
+              <label for="date">DATE</label>
+              <input id="date" type="date">
             </div>
-            <label class="field-label" for="source-zone">Starting time zone</label>
-            <select id="source-zone" class="zone-select"><option value="Asia/Manila">Manila, Philippines</option><option value="America/Los_Angeles">Los Angeles, USA</option><option value="America/New_York">New York, USA</option><option value="Europe/London">London, UK</option><option value="Asia/Tokyo">Tokyo, Japan</option><option value="Australia/Sydney">Sydney, Australia</option><option value="Asia/Singapore">Singapore</option></select>
-            <div class="rate-hint" id="source-hint" style="margin-top:9px">Updates every minute while Live is on.</div>
+
+            <div>
+              <label for="time">TIME</label>
+              <input id="time" type="time">
+            </div>
           </div>
-          <div class="section results">
-            <div class="results-header"><h3>Converted times</h3><button class="small-btn" id="add-zone">+ Add city</button></div>
-            <div class="zone-menu" id="zone-menu"></div>
-            <div class="zone-list" id="zone-list" aria-live="polite"></div>
+
+          <label for="source">STARTING TIME ZONE</label>
+
+          <select id="source">
+            <option value="Asia/Manila">Manila, Philippines</option>
+            <option value="America/Los_Angeles">Los Angeles, USA</option>
+            <option value="America/New_York">New York, USA</option>
+            <option value="America/Vancouver">Vancouver, Canada</option>
+            <option value="Europe/London">London, UK</option>
+            <option value="UTC">UTC</option>
+          </select>
+
+          <div class="hint" id="hint">
+            Updates every minute while Live is on.
+          </div>
+
+        </div>
+
+        <!-- Converted Times -->
+
+        <div class="panel results-panel">
+
+          <div class="panel-head results-head">
+            <span class="panel-title">Converted times</span>
+
+            <div class="add-wrap">
+              <button class="small-button" onclick="togglePicker()">
+                + Add city
+              </button>
+
+              <div class="add-picker" id="picker"></div>
+            </div>
+          </div>
+
+          <div class="city-list" id="cities"></div>
+
+        </div>
+
+      </div>
+
+      <div class="foot">
+        <span>
+          Times adjust automatically for daylight saving changes.
+        </span>
+
+        <span id="foot-zone">
+          Manila is your starting time zone.
+        </span>
+      </div>
+
+    </section>
+
+    <!-- PAYPAL CALCULATOR -->
+
+    <section id="pay-view" class="view">
+
+      <div class="head">
+        <div>
+          <div class="eyebrow">MONEY TOOLS</div>
+          <h1>PayPal Calculator</h1>
+        </div>
+
+        <div class="head-right">
+          <div class="toggle">
+            <button class="active">USD → PHP</button>
+          </div>
+
+          <span class="live">
+            <span class="dot"></span>Fee preview
+          </span>
+        </div>
+      </div>
+
+      <div class="rule"></div>
+
+      <div class="pay-grid">
+
+        <!-- Target Amount -->
+
+        <div class="panel pay-panel">
+          <div class="pay-title">
+            01 · Amount I want to receive
+          </div>
+
+          <label for="net">TARGET NET (USD)</label>
+
+          <input id="net" type="number" value="45" step=".01">
+
+          <div class="metric-label">CHARGE YOUR CLIENT</div>
+
+          <div class="metric" id="charge">$47.39</div>
+
+          <div class="detail">
+            <span>Estimated PayPal fee</span>
+            <strong id="fee1">$2.39</strong>
           </div>
         </div>
-        <div class="widget-footer"><span class="footer-note">Times adjust automatically for daylight saving changes.</span><span class="footer-note" id="conversion-note">Manila is your starting time zone.</span></div>
-      </section>
-    </div>
-    <p class="hint">Interactive layout preview. Both cards are shown at their intended embed dimensions.</p>
-  </main>
-  <script>
-    const $ = id => document.getElementById(id);
-    const money = x => '$' + (Number.isFinite(x) ? x : 0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-    const php = x => '₱' + (Number.isFinite(x) ? x : 0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
-    const round2 = x => Math.round((x + Number.EPSILON)*100)/100;
-    function updatePayPal(){
-      const target = Math.max(0, Number($('target').value)||0);
-      const gross = target ? Math.ceil(((target+.30)/.956-1e-10)*100)/100 : 0;
-      const targetFee = gross ? round2(gross*.044+.30) : 0;
-      const actual = Math.max(0,Number($('actual').value)||0);
-      const fee = actual ? round2(actual*.044+.30) : 0;
-      const net = Math.max(0, round2(actual-fee));
-      const rate = Math.max(0,Number($('market-rate').value)||0);
-      const adjusted = rate*(1-.0331);
-      $('gross-value').textContent=money(gross);
-      $('target-fee').textContent=money(targetFee);
-      $('actual-net').textContent=money(net);
-      $('actual-fee').textContent=money(fee);
-      $('php-value').textContent=php(round2(net*adjusted));
-      $('adjusted-rate').textContent=php(adjusted);
-    }
-    ['target','actual','market-rate'].forEach(id=>$(id).addEventListener('input', updatePayPal));
-    updatePayPal();
 
-    const zones = [
-      {id:'America/Los_Angeles',name:'Los Angeles'},
-      {id:'America/New_York',name:'New York'},
-      {id:'Europe/London',name:'London'},
-      {id:'Asia/Tokyo',name:'Tokyo'},
-      {id:'Australia/Sydney',name:'Sydney'},
-      {id:'Asia/Singapore',name:'Singapore'},
-      {id:'Europe/Berlin',name:'Berlin'},
-      {id:'Asia/Dubai',name:'Dubai'},
-      {id:'Asia/Manila',name:'Manila'}
-    ];
-    let activeZones=['America/Los_Angeles','America/New_York','Europe/London'];
-    let clockFormat=12, live=true, chosenInstant=new Date();
-    function timeParts(date, zone){
-      const parts=new Intl.DateTimeFormat('en-US',{timeZone:zone,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(date);
-      const x={}; parts.forEach(p=>{if(p.type!=='literal')x[p.type]=p.value;});return x;
-    }
-    function setFieldsFromInstant(){
-      const p=timeParts(chosenInstant,$('source-zone').value);
-      $('source-date').value=`${p.year}-${p.month}-${p.day}`;
-      $('source-time').value=`${p.hour}:${p.minute}`;
-    }
-    function wallToInstant(){
-      const d=$('source-date').value,t=$('source-time').value,z=$('source-zone').value;
-      if(!d||!t)return null;
-      const desired=`${d}T${t.slice(0,5)}`;
-      const central=Date.parse(desired+':00Z');
-      if(!Number.isFinite(central))return null;
-      let found=null;
-      for(let m=-840;m<=840;m+=15){
-        const candidate=new Date(central+m*60000);
-        const p=timeParts(candidate,z);
-        if(`${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`===desired){ found=candidate;break; }
-      }
-      return found;
-    }
-    function formatZone(date,zone){
-      const hour=new Intl.DateTimeFormat('en-US',{timeZone:zone,hour:'numeric',minute:'2-digit',hour12:clockFormat===12}).format(date);
-      const day=new Intl.DateTimeFormat('en-US',{timeZone:zone,weekday:'short',month:'short',day:'numeric'}).format(date);
-      const sourceDay=new Intl.DateTimeFormat('en-CA',{timeZone:$('source-zone').value,year:'numeric',month:'2-digit',day:'2-digit'}).format(date);
-      const resultDay=new Intl.DateTimeFormat('en-CA',{timeZone:zone,year:'numeric',month:'2-digit',day:'2-digit'}).format(date);
-      const diff=Math.round((Date.parse(resultDay)-Date.parse(sourceDay))/86400000);
-      const relation=diff===-1?' · Previous day':diff===1?' · Next day':diff<-1?' · Earlier':diff>1?' · Later':'';
-      return {hour,day:day+relation};
-    }
-    function renderZones(){
-      $('live-pill').innerHTML=live?'<span class="tiny-dot"></span>LIVE':'MANUAL';
-      $('source-hint').textContent=live?'Updates every minute while Live is on.':'Manual time selected. Use now to resume Live.';
-      const sourceName=$('source-zone').selectedOptions[0].textContent.split(',')[0];
-      $('conversion-note').textContent=sourceName+' is your starting time zone.';
-      const list=$('zone-list');list.replaceChildren();
-      for(const id of activeZones){
-        const z=zones.find(x=>x.id===id),p=formatZone(chosenInstant,z.id);
-        const row=document.createElement('div');row.className='zone-row';
-        const meta=document.createElement('div'),city=document.createElement('div'),date=document.createElement('div');
-        city.className='city';city.textContent=z.name;date.className='zone-date';date.textContent=p.day;meta.append(city,date);
-        const time=document.createElement('div');time.className='zone-time';time.textContent=p.hour;
-        const remove=document.createElement('button');remove.className='remove-zone';remove.textContent='×';remove.title='Remove '+z.name;remove.setAttribute('aria-label','Remove '+z.name);remove.addEventListener('click',()=>{activeZones=activeZones.filter(x=>x!==id);renderZones();});
-        row.append(meta,time,remove);list.appendChild(row);
-      }
-      if(!activeZones.length){const empty=document.createElement('p');empty.className='rate-hint';empty.textContent='Add a city to see converted times.';list.appendChild(empty);}
-      $('zone-menu').replaceChildren();
-      for(const z of zones.filter(z=>!activeZones.includes(z.id))){
-        const b=document.createElement('button');b.textContent=z.name;b.addEventListener('click',()=>{activeZones.push(z.id);$('zone-menu').classList.remove('open');renderZones();});$('zone-menu').appendChild(b);
-      }
-    }
-    $('add-zone').addEventListener('click',()=>$('zone-menu').classList.toggle('open'));
-    document.addEventListener('click',e=>{if(!e.target.closest('#add-zone')&&!e.target.closest('#zone-menu'))$('zone-menu').classList.remove('open');});
-    document.querySelectorAll('[data-format]').forEach(b=>b.addEventListener('click',()=>{
-      clockFormat=Number(b.dataset.format);
-      document.querySelectorAll('[data-format]').forEach(x=>{x.classList.toggle('selected',x===b);x.setAttribute('aria-pressed',String(x===b));});renderZones();
-    }));
-    function manualUpdate(){live=false;const instant=wallToInstant();if(instant){chosenInstant=instant;$('source-hint').style.color='';}else{$('source-hint').textContent='That local time may not exist due to a clock change.';$('source-hint').style.color='#a55c3e';}renderZones();if(!instant)$('source-hint').textContent='That local time may not exist due to a clock change.';}
-    ['source-date','source-time'].forEach(id=>$(id).addEventListener('change',manualUpdate));
-    $('source-zone').addEventListener('change',()=>{if(live){chosenInstant=new Date();setFieldsFromInstant();renderZones();}else{manualUpdate();}});
-    $('use-now').addEventListener('click',()=>{live=true;chosenInstant=new Date();setFieldsFromInstant();renderZones();});
-    setInterval(()=>{if(live){chosenInstant=new Date();setFieldsFromInstant();renderZones();}},60000);
-    setFieldsFromInstant();renderZones();
+        <!-- Amount Charged -->
 
-    function showTab(which){
-      const paypal=which==='paypal';$('paypal-widget').hidden=!paypal;$('timezone-widget').hidden=paypal;
-      $('tab-paypal').classList.toggle('active',paypal);$('tab-time').classList.toggle('active',!paypal);
-      $('tab-paypal').setAttribute('aria-selected',String(paypal));$('tab-time').setAttribute('aria-selected',String(!paypal));
+        <div class="panel pay-panel">
+          <div class="pay-title">
+            02 · Actual amount charged
+          </div>
+
+          <label for="gross">WHAT I'LL CHARGE (USD)</label>
+
+          <input id="gross" type="number" value="48" step=".01">
+
+          <div class="metric-label">I'LL RECEIVE AFTER FEES</div>
+
+          <div class="metric" id="received">$45.59</div>
+
+          <div class="detail">
+            <span>Estimated PayPal fee</span>
+            <strong id="fee2">$2.41</strong>
+          </div>
+        </div>
+
+        <!-- USD to PHP -->
+
+        <div class="panel pay-panel">
+          <div class="pay-title">
+            03 · USD to PHP estimate
+          </div>
+
+          <label for="rate">MARKET RATE (PHP / USD)</label>
+
+          <input id="rate" type="number" value="58.50" step=".01">
+
+          <div class="metric-label">ESTIMATED PESOS RECEIVED</div>
+
+          <div class="metric" id="pesos">₱2,578.63</div>
+
+          <div class="detail">
+            <span>Adjusted PayPal rate</span>
+            <strong id="adj">₱56.56</strong>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="foot">
+        <span>
+          PayPal estimate: 4.4% + $0.30 per transaction.
+        </span>
+
+        <span>
+          Exchange rate is editable, not live.
+        </span>
+      </div>
+
+    </section>
+
+  </div>
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+
+  const allZones = [
+    { name: "Los Angeles", zone: "America/Los_Angeles" },
+    { name: "New York", zone: "America/New_York" },
+    { name: "London", zone: "Europe/London" },
+    { name: "Vancouver", zone: "America/Vancouver" },
+    { name: "Manila", zone: "Asia/Manila" },
+    { name: "Chicago", zone: "America/Chicago" },
+    { name: "UTC", zone: "UTC" }
+  ];
+
+  let cities = allZones.slice(0, 3);
+  let live = true;
+  let hour24 = false;
+
+  // Switch tabs
+
+  function switchTab(t) {
+    $("clock-view").classList.toggle("active", t === "clock");
+    $("pay-view").classList.toggle("active", t === "pay");
+
+    $("tab-clock").classList.toggle("active", t === "clock");
+    $("tab-pay").classList.toggle("active", t === "pay");
+  }
+
+  // Get date and time parts in a selected time zone
+
+  function parts(date, zone) {
+    return Object.fromEntries(
+      new Intl.DateTimeFormat("en-US", {
+        timeZone: zone,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23"
+      })
+        .formatToParts(date)
+        .filter(x => x.type !== "literal")
+        .map(x => [x.type, Number(x.value)])
+    );
+  }
+
+  // Use current time
+
+  function useNow() {
+    live = true;
+
+    setInputsFromInstant(new Date());
+    updateLiveUI();
+    renderCities();
+  }
+
+  function setInputsFromInstant(date) {
+    const p = parts(date, $("source").value);
+
+    $("date").value =
+      `${p.year}-${String(p.month).padStart(2, "0")}-${String(p.day).padStart(2, "0")}`;
+
+    $("time").value =
+      `${String(p.hour).padStart(2, "0")}:${String(p.minute).padStart(2, "0")}`;
+  }
+
+  // Convert a selected wall-clock time to an instant
+
+  function wallToInstant() {
+    if (!$("date").value || !$("time").value) {
+      return new Date();
     }
-    $('tab-paypal').addEventListener('click',()=>showTab('paypal'));
-    $('tab-time').addEventListener('click',()=>showTab('time'));
-  </script>
+
+    const [y, m, d] = $("date").value.split("-").map(Number);
+    const [h, n] = $("time").value.split(":").map(Number);
+
+    const target = Date.UTC(y, m - 1, d, h, n);
+
+    let guess = target;
+
+    for (let i = 0; i < 4; i++) {
+      const p = parts(new Date(guess), $("source").value);
+
+      guess += target - Date.UTC(
+        p.year,
+        p.month - 1,
+        p.day,
+        p.hour,
+        p.minute
+      );
+    }
+
+    return new Date(guess);
+  }
+
+  // Format converted times
+
+  function formatTime(date, zone) {
+    return new Intl.DateTimeFormat("en-US", {
+      timeZone: zone,
+      hour: hour24 ? "2-digit" : "numeric",
+      minute: "2-digit",
+      hour12: !hour24,
+      hourCycle: "h23"
+    }).format(date);
+  }
+
+  function formatDay(date, zone) {
+    return new Intl.DateTimeFormat("en-US", {
+      timeZone: zone,
+      weekday: "short",
+      month: "short",
+      day: "numeric"
+    }).format(date);
+  }
+
+  // Render city list
+
+  function renderCities() {
+    const instant = live ? new Date() : wallToInstant();
+
+    const sourceP = parts(instant, $("source").value);
+
+    const sourceDay = Date.UTC(
+      sourceP.year,
+      sourceP.month - 1,
+      sourceP.day
+    );
+
+    $("cities").innerHTML = "";
+
+    cities.forEach((city, i) => {
+      const p = parts(instant, city.zone);
+
+      const diff = Math.round(
+        (
+          Date.UTC(p.year, p.month - 1, p.day) - sourceDay
+        ) / 86400000
+      );
+
+      const relation =
+        diff < 0 ? " · Previous day" :
+        diff > 0 ? " · Next day" : "";
+
+      const row = document.createElement("div");
+
+      row.className = "city-row";
+
+      row.innerHTML = `
+        <div>
+          <div class="city-name">${city.name}</div>
+          <div class="city-date">
+            ${formatDay(instant, city.zone)}${relation}
+          </div>
+        </div>
+
+        <div class="city-right">
+          <span class="city-time">
+            ${formatTime(instant, city.zone)}
+          </span>
+
+          <button
+            class="remove"
+            aria-label="Remove ${city.name}"
+          >×</button>
+        </div>
+      `;
+
+      row.querySelector("button").onclick = () => {
+        cities.splice(i, 1);
+        renderCities();
+      };
+
+      $("cities").appendChild(row);
+    });
+
+    $("foot-zone").textContent =
+      $("source").selectedOptions[0].text.split(",")[0] +
+      " is your starting time zone.";
+  }
+
+  // Live mode
+
+  function updateLiveUI() {
+    $("live").classList.toggle("off", !live);
+
+    $("live").innerHTML = live
+      ? '<span class="dot"></span>LIVE'
+      : "MANUAL";
+
+    $("hint").textContent = live
+      ? "Updates every minute while Live is on."
+      : "Using your selected time.";
+  }
+
+  function toggleLive() {
+    live = !live;
+
+    if (live) {
+      setInputsFromInstant(new Date());
+    }
+
+    updateLiveUI();
+    renderCities();
+  }
+
+  // 12h / 24h format
+
+  function setHours(v) {
+    hour24 = v;
+
+    $("hour12").classList.toggle("active", !v);
+    $("hour24").classList.toggle("active", v);
+
+    renderCities();
+  }
+
+  // Add a city
+
+  function togglePicker() {
+    const picker = $("picker");
+
+    picker.style.display =
+      picker.style.display === "block" ? "none" : "block";
+
+    picker.innerHTML = "";
+
+    allZones
+      .filter(z => !cities.some(c => c.zone === z.zone))
+      .forEach(z => {
+        const button = document.createElement("button");
+
+        button.textContent = z.name;
+
+        button.onclick = () => {
+          cities.push(z);
+
+          picker.style.display = "none";
+
+          renderCities();
+        };
+
+        picker.appendChild(button);
+      });
+  }
+
+  // Manual date and time input
+
+  $("date").addEventListener("input", () => {
+    live = false;
+    updateLiveUI();
+    renderCities();
+  });
+
+  $("time").addEventListener("input", () => {
+    live = false;
+    updateLiveUI();
+    renderCities();
+  });
+
+  $("source").addEventListener("change", () => {
+    if (live) {
+      setInputsFromInstant(new Date());
+    }
+
+    renderCities();
+  });
+
+  // Refresh every minute
+
+  setInterval(() => {
+    if (live) {
+      setInputsFromInstant(new Date());
+      renderCities();
+    }
+  }, 60000);
+
+  // PayPal calculator
+
+  function updatePayPal() {
+    const net = Number($("net").value) || 0;
+    const gross = Number($("gross").value) || 0;
+    const rate = Number($("rate").value) || 0;
+
+    const targetCharge =
+      Math.ceil((net + 0.30) / 0.956 * 100) / 100;
+
+    const fee = gross * 0.044 + 0.30;
+
+    const received = Math.max(0, gross - fee);
+
+    const adjusted = rate * (1 - 0.0331);
+
+    const usd = n =>
+      new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD"
+      }).format(n);
+
+    const php = n =>
+      new Intl.NumberFormat("en-PH", {
+        style: "currency",
+        currency: "PHP"
+      }).format(n);
+
+    $("charge").textContent = usd(targetCharge);
+
+    $("fee1").textContent =
+      usd(targetCharge - net);
+
+    $("received").textContent = usd(received);
+
+    $("fee2").textContent = usd(fee);
+
+    $("pesos").textContent =
+      php(received * adjusted);
+
+    $("adj").textContent =
+      "₱" + adjusted.toFixed(2);
+  }
+
+  ["net", "gross", "rate"].forEach(id => {
+    $(id).addEventListener("input", updatePayPal);
+  });
+
+  // Initialize
+
+  useNow();
+  updatePayPal();
+
+</script>
+
 </body>
 </html>
