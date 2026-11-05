@@ -10,20 +10,20 @@
     body { font: 14px/1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #272725; }
     button, input, select { font: inherit; }
     button { cursor: pointer; }
-    .preview { padding: 0; background: transparent; }
+    .preview { display:flex; justify-content:center; align-items:center; min-height:100vh; padding:18px; background:transparent; }
     .tabs { display: flex; gap: 3px; padding: 3px; background: #f2f1ef; border: 1px solid #e9e7e2; border-radius: 10px; }
     .tabs button { border: 0; background: transparent; color: #777570; border-radius: 7px; padding: 7px 11px; font-size: 11px; font-weight: 650; white-space: nowrap; }
     .tabs button.active { background: #fff; color: #2c2c2a; box-shadow: 0 1px 3px #302c251c; }
-    .stage { max-width: 815px; margin: 0; background: transparent; }
-    .widget { --text:#282826; --muted:#85847f; --line:#e8e6e2; --soft:#faf9f7; --surface:#fff; --green:#4f806f; --green-soft:#eaf4ee; background:var(--surface); color:var(--text); width: 815px; height: 360px; padding: 17px 20px 14px; border: 1px solid #e5e3df; border-radius: 18px; box-shadow: 0 8px 24px #37332a08; overflow:hidden; }
+    .stage { width:100%; max-width:815px; margin:0 auto; background:transparent; }
+    .widget { --text:#282826; --muted:#85847f; --line:#e8e6e2; --soft:#faf9f7; --surface:#fff; --green:#4f806f; --green-soft:#eaf4ee; background:var(--surface); color:var(--text); width:100%; max-width:815px; height:420px; padding:17px 20px 16px; border:1px solid #e5e3df; border-radius:18px; box-shadow:0 0 0 1px #37332a08,0 6px 24px #37332a20; overflow:hidden; }
     .widget[hidden] { display:none; }
     .whead { display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; border-bottom:1px solid var(--line); height: 58px; }
     .eyebrow { text-transform:uppercase; letter-spacing:1.5px; font-size:10px; font-weight:750; color:#8a8985; margin-bottom:3px; }
     .whead h2 { font-size:21px; letter-spacing:-.7px; line-height:1.05; margin:0; font-weight:730; }
     .head-actions { display:flex; align-items:center; gap:9px; }
     .mini-pill { color:#77756f; font-size:11px; font-weight:650; border:1px solid var(--line); padding:6px 10px; border-radius:20px; white-space:nowrap; background:var(--soft); }
-    .widget-body { display:grid; gap:11px; padding-top:12px; height:263px; }
-    .paypal-body { grid-template-columns: 1fr 1fr 1fr; }
+    .widget-body { display:grid; gap:11px; padding-top:12px; height:324px; }
+    .paypal-body { grid-template-columns:repeat(3,minmax(0,1fr)); }
     .section { border:1px solid var(--line); background:var(--soft); border-radius:13px; padding:12px 13px; min-width:0; position:relative; }
     .section h3 { font-size:12px; margin:0 0 12px; font-weight:740; letter-spacing:.05px; }
     .section-top { display:flex; justify-content:space-between; align-items:center; gap:6px; }
@@ -38,12 +38,16 @@
     .statline { margin-top:9px; padding-top:8px; border-top:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; gap:8px; color:var(--muted); font-size:11px; }
     .statline strong { color:var(--text); font-variant-numeric:tabular-nums; font-size:12px; }
     .rate-field { display:flex; gap:7px; align-items:center; }
-    .rate-field .money-input { flex:1; height:41px; }
-    .rate-field .money-input input { font-size:17px; }
+    .rate-field .money-input { flex:1; min-width:0; height:41px; }
+    .rate-value { color:var(--text); font-size:17px; font-weight:660; letter-spacing:-.35px; min-width:0; white-space:nowrap; }
     .rate-hint { font-size:10px; color:var(--muted); line-height:1.4; margin-top:5px; }
+    .rate-hint a { color:var(--green); text-decoration:underline; text-underline-offset:2px; }
+    .rate-refresh { flex:none; width:38px; height:41px; padding:0; font-size:18px; touch-action:manipulation; }
+    .rate-refresh:focus-visible { outline:2px solid #78a992; outline-offset:2px; }
+    .rate-refresh:disabled { opacity:.5; cursor:wait; }
     .tiny-dot { display:inline-block; height:6px; width:6px; border-radius:50%; background:#76a78d; margin-right:5px; vertical-align:1px; }
     .badge-soft { background:var(--green-soft); color:var(--green); padding:5px 8px; border-radius:14px; font-size:10px; font-weight:750; }
-    .time-body { grid-template-columns: 286px 1fr; }
+    .time-body { grid-template-columns:minmax(0,286px) minmax(0,1fr); }
     .timezone-start h3 { margin:0; }
     .small-btn { background:#fff; border:1px solid #e8e5df; border-radius:8px; color:#6f6d68; font-weight:650; padding:5px 8px; font-size:10px; }
     .small-btn:hover { background:#f3f1ee; }
@@ -67,7 +71,22 @@
     .zone-menu.open { display:block; }
     .zone-menu button { display:block; width:100%; border:0; padding:8px; border-radius:6px; background:transparent; color:#343330; font-size:11px; text-align:left; }
     .zone-menu button:hover { background:#f5f3ef; }
-    @media (max-width:815px) { .stage { overflow-x:auto; } .widget { flex-shrink:0; } }
+    @media (max-width:680px) {
+      .widget { height:auto; min-height:420px; }
+      .widget-body { height:auto; }
+      .paypal-body { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .paypal-body > .section:last-child { grid-column:1/-1; }
+      .time-body { grid-template-columns:1fr; }
+      .zone-list { max-height:none; }
+    }
+    @media (max-width:500px) {
+      .widget { padding:14px; }
+      .whead { height:auto; min-height:58px; gap:12px; flex-wrap:wrap; }
+      .head-actions { flex-wrap:wrap; }
+      .paypal-body { grid-template-columns:1fr; }
+      .paypal-body > .section:last-child { grid-column:auto; }
+      .section { padding:12px; }
+    }
   </style>
 </head>
 <body>
@@ -95,10 +114,11 @@
           </div>
           <div class="section">
             <div class="section-top"><h3>03 · USD to PHP estimate</h3><span class="badge-soft">−3.31%</span></div>
-            <label class="field-label" for="market-rate">Example market rate (PHP / USD)</label>
-            <div class="rate-field"><div class="money-input"><span class="currency">₱</span><input id="market-rate" type="number" min="0" step="0.0001" value="58.50" inputmode="decimal"></div></div>
-            <div class="big-result"><div class="field-label">Estimated pesos received</div><div class="big-number" id="php-value">₱2,578.91</div></div>
-            <div class="statline"><span>Adjusted PayPal rate</span><strong id="adjusted-rate">₱56.56</strong></div>
+            <label class="field-label" for="market-rate">Latest market rate (PHP / USD)</label>
+            <div class="rate-field"><div class="money-input"><span class="currency">₱</span><output class="rate-value" id="market-rate" aria-live="polite">Checking…</output></div><button type="button" class="small-btn rate-refresh" id="refresh-rate" title="Refresh exchange rate" aria-label="Refresh exchange rate">↻</button></div>
+            <div class="rate-hint"><span id="rate-status" role="status">Getting the latest rate…</span> <a id="rate-source" target="_blank" rel="noopener noreferrer" hidden>Source</a></div>
+            <div class="big-result"><div class="field-label">Estimated pesos received</div><div class="big-number" id="php-value">—</div></div>
+            <div class="statline"><span>Adjusted PayPal rate</span><strong id="adjusted-rate">—</strong></div>
           </div>
         </div>
       </section>
@@ -133,6 +153,12 @@
     const money = x => '$' + (Number.isFinite(x) ? x : 0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
     const php = x => '₱' + (Number.isFinite(x) ? x : 0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
     const round2 = x => Math.round((x + Number.EPSILON)*100)/100;
+    const PHP_RATE_ADJUSTMENT = 0.9669;
+    const RATE_REFRESH_MS = 15 * 60 * 1000;
+    let currentMarketRate = null;
+    let currentRateProvider = null;
+    let lastRateAttemptAt = 0;
+    let rateRequestInProgress = false;
     function updatePayPal(){
       const target = Math.max(0, Number($('target').value)||0);
       const gross = target ? Math.ceil(((target+.30)/.956-1e-10)*100)/100 : 0;
@@ -140,17 +166,108 @@
       const actual = Math.max(0,Number($('actual').value)||0);
       const fee = actual ? round2(actual*.044+.30) : 0;
       const net = Math.max(0, round2(actual-fee));
-      const rate = Math.max(0,Number($('market-rate').value)||0);
-      const adjusted = rate*(1-.0331);
       $('gross-value').textContent=money(gross);
       $('target-fee').textContent=money(targetFee);
       $('actual-net').textContent=money(net);
       $('actual-fee').textContent=money(fee);
-      $('php-value').textContent=php(round2(net*adjusted));
-      $('adjusted-rate').textContent=php(adjusted);
+      if(currentMarketRate===null){
+        $('php-value').textContent='—';
+        $('adjusted-rate').textContent='—';
+      }else{
+        const adjusted=currentMarketRate*PHP_RATE_ADJUSTMENT;
+        $('php-value').textContent=php(round2(net*adjusted));
+        $('adjusted-rate').textContent='₱'+adjusted.toFixed(5);
+      }
     }
-    ['target','actual','market-rate'].forEach(id=>$(id).addEventListener('input', updatePayPal));
+    ['target','actual'].forEach(id=>$(id).addEventListener('input', updatePayPal));
     updatePayPal();
+
+    function sourceStatus(message, source){
+      $('rate-status').textContent=message;
+      const link=$('rate-source');
+      if(source){link.hidden=false;link.href=source.url;link.textContent=source.linkText||source.name;}
+      else{link.hidden=true;link.removeAttribute('href');link.textContent='';}
+    }
+    function lastObserved(iso, daily=false){
+      if(!iso)return '';
+      const date=new Date(daily&&/^\d{4}-\d{2}-\d{2}$/.test(iso)?iso+'T12:00:00Z':iso);
+      if(!Number.isFinite(date.getTime()))return '';
+      return new Intl.DateTimeFormat('en-PH',{timeZone:'Asia/Manila',month:'short',day:'numeric',...(daily?{}:{hour:'numeric',minute:'2-digit'})}).format(date);
+    }
+    async function fetchRateJson(url){
+      const controller=new AbortController();
+      const timeout=setTimeout(()=>controller.abort(),9000);
+      try{
+        const response=await fetch(url,{cache:'no-store',signal:controller.signal});
+        if(!response.ok)throw new Error('HTTP '+response.status);
+        return await response.json();
+      }finally{clearTimeout(timeout);}
+    }
+    const rateProviders=[
+      {
+        name:'ExchangeRate.dev',url:'https://exchangerate.dev/',
+        endpoint:'https://api.exchangerate.dev/v1/latest/USD?symbols=PHP',
+        read(data){
+          if(data.result!=='success'||data.base!=='USD')throw new Error('Invalid rate response');
+          const rate=Number(data.rates?.PHP);
+          if(!Number.isFinite(rate)||rate<=0)throw new Error('Missing PHP rate');
+          const feed=data.sources?.PHP||data.source;
+          const age=feed==='live'?'≈15-min delayed':feed==='ecb_daily'||feed==='market_daily'?'Daily reference':'Latest reference';
+          return {rate,label:age,observed:data.effective_at?.PHP||data.data_updated_at||data.timestamp||null,daily:age==='Daily reference',stale:data.stale?.PHP===true};
+        }
+      },
+      {
+        name:'Frankfurter',url:'https://frankfurter.dev/',
+        endpoint:'https://api.frankfurter.dev/v2/rate/USD/PHP',
+        read(data){
+          const rate=Number(data.rate);
+          if(!Number.isFinite(rate)||rate<=0)throw new Error('Missing PHP rate');
+          return {rate,label:'Daily reference',observed:data.date||null,daily:true,stale:false};
+        }
+      },
+      {
+        name:'Exchange Rate API',linkText:'Rates By Exchange Rate API',url:'https://www.exchangerate-api.com',
+        endpoint:'https://open.er-api.com/v6/latest/USD',
+        read(data){
+          if(data.result!=='success'||data.base_code!=='USD')throw new Error('Invalid rate response');
+          const rate=Number(data.rates?.PHP);
+          if(!Number.isFinite(rate)||rate<=0)throw new Error('Missing PHP rate');
+          const observed=Number.isFinite(data.time_last_update_unix)?new Date(data.time_last_update_unix*1000).toISOString():null;
+          return {rate,label:'Daily reference',observed,daily:false,stale:false};
+        }
+      }
+    ];
+    async function refreshExchangeRate(){
+      if(rateRequestInProgress)return;
+      rateRequestInProgress=true;
+      lastRateAttemptAt=Date.now();
+      $('refresh-rate').disabled=true;
+      sourceStatus('Checking latest available rate…',null);
+      try{
+        let latest=null,provider=null;
+        for(const option of rateProviders){
+          try{latest=option.read(await fetchRateJson(option.endpoint));provider=option;break;}
+          catch(error){console.warn('Exchange rate source unavailable:',option.name,error.message);}
+        }
+        if(!latest)throw new Error('All rate providers unavailable');
+        currentMarketRate=latest.rate;
+        currentRateProvider=provider;
+        $('market-rate').textContent=latest.rate.toFixed(4);
+        const observed=lastObserved(latest.observed,latest.daily);
+        const freshness=latest.stale?'Rate may be stale':latest.label;
+        sourceStatus(freshness+(observed?' · '+observed:''),provider);
+        updatePayPal();
+      }catch(error){
+        if(currentMarketRate===null){$('market-rate').textContent='Unavailable';}
+        sourceStatus(currentMarketRate===null?'Could not reach live rate services. This preview may block network requests.':'Refresh failed · using last fetched rate',currentRateProvider);
+        updatePayPal();
+      }finally{rateRequestInProgress=false;$('refresh-rate').disabled=false;}
+    }
+    $('refresh-rate').addEventListener('click',refreshExchangeRate);
+    setInterval(refreshExchangeRate,RATE_REFRESH_MS);
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden&&Date.now()-lastRateAttemptAt>=RATE_REFRESH_MS)refreshExchangeRate();});
+    window.addEventListener('online',()=>{if(Date.now()-lastRateAttemptAt>=60000)refreshExchangeRate();});
+    refreshExchangeRate();
 
     const zones = [
       {id:'America/Los_Angeles',name:'Los Angeles'},
